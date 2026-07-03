@@ -3,132 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lift Leaderboards</title>
+    <title>Aron Wolfson - Lift Tracker</title>
+    <!-- Tailwind CSS for modern, ultra-clean design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Font for sleek premium typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Minimalist Reset */
         body {
-            margin: 0;
-            padding: 0;
+            font-family: 'Inter', sans-serif;
             background-color: #ffffff;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
         }
-
-        /* Button Container */
-        .button-container {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
+        /* Custom toggle switch styles for a premium look */
+        .toggle-bg {
+            transition: background-color 0.2s ease, border-color 0.2s ease;
         }
-
-        /* Styling for the Lift Buttons */
-        .lift-btn {
-            background-color: #ffffff;
-            color: #000000;
-            border: 2px solid #000000;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 6px;
-            transition: all 0.2s ease;
-        }
-
-        .lift-btn:hover {
-            background-color: #000000;
-            color: #ffffff;
-        }
-
-        /* Leaderboard Container */
-        .leaderboard {
-            display: none; /* Hidden by default */
-            width: 300px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-
-        .leaderboard h2 {
-            margin-top: 0;
-            font-size: 20px;
-            border-bottom: 2px solid #000000;
-            padding-bottom: 10px;
-        }
-
-        /* Leaderboard Row Entry */
-        .leaderboard-entry {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 5px;
-            font-size: 18px;
-        }
-
-        .rank {
-            font-weight: bold;
-            margin-right: 10px;
-        }
-
-        .name {
-            flex-grow: 1;
-            text-align: left;
-        }
-
-        .weight {
-            font-weight: bold;
-            color: #333333;
+        .toggle-dot {
+            transition: transform 0.2s ease;
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col items-center justify-center p-6 bg-white selection:bg-neutral-200">
 
-    <div class="button-container">
-        <button class="lift-btn" onclick="toggleLeaderboard('bench')">Bench Press</button>
-        <button class="lift-btn" onclick="toggleLeaderboard('squat')">Squat</button>
-        <button class="lift-btn" onclick="toggleLeaderboard('deadlift')">Deadlift</button>
-    </div>
+    <div class="w-full max-w-2xl flex flex-col items-center">
+        
+        <!-- Minimalist Lift Selectors (Pure White / Stark Black) -->
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button 
+                id="btn-bench" 
+                onclick="setLift('bench')" 
+                class="px-6 py-3 text-sm font-semibold tracking-wide border-2 border-black rounded-lg transition-all duration-200 bg-black text-white hover:bg-neutral-900 focus:outline-none">
+                Bench Press
+            </button>
+            <button 
+                id="btn-squat" 
+                onclick="setLift('squat')" 
+                class="px-6 py-3 text-sm font-semibold tracking-wide border-2 border-black rounded-lg transition-all duration-200 bg-white text-black hover:bg-neutral-100 focus:outline-none">
+                Squat
+            </button>
+            <button 
+                id="btn-deadlift" 
+                onclick="setLift('deadlift')" 
+                class="px-6 py-3 text-sm font-semibold tracking-wide border-2 border-black rounded-lg transition-all duration-200 bg-white text-black hover:bg-neutral-100 focus:outline-none">
+                Deadlift
+            </button>
+        </div>
 
-    <!-- Bench Press Leaderboard -->
-    <div id="bench-leaderboard" class="leaderboard">
-        <h2>Bench Press Leaderboard</h2>
-        <div class="leaderboard-entry">
-            <span class="rank">1.</span>
-            <span class="name">Aron Wolfson</span>
-            <span class="weight">310lb</span>
+        <!-- Category Segmented Control (All-Time Max vs. Recorded) -->
+        <div class="mb-8 flex items-center justify-center bg-neutral-100 p-1 rounded-xl w-72 border border-neutral-200">
+            <button 
+                id="btn-cat-max" 
+                onclick="setCategory('max')" 
+                class="flex-1 text-xs py-2 px-3 font-semibold rounded-lg transition-all duration-200 bg-white text-neutral-900 shadow-sm focus:outline-none">
+                All-Time Max
+            </button>
+            <button 
+                id="btn-cat-recorded" 
+                onclick="setCategory('recorded')" 
+                class="flex-1 text-xs py-2 px-3 font-semibold rounded-lg transition-all duration-200 text-neutral-500 hover:text-neutral-900 focus:outline-none">
+                Recorded
+            </button>
+        </div>
+
+        <!-- Leaderboard Display Container -->
+        <div class="w-full bg-white border border-neutral-200 rounded-xl overflow-hidden shadow-sm transition-all duration-300">
+            
+            <div class="px-6 py-5 border-b border-neutral-100 flex justify-between items-center bg-neutral-50/50">
+                <h2 id="leaderboard-title" class="text-sm font-bold tracking-wider uppercase text-neutral-800">Bench Press Leaderboard</h2>
+                <span id="category-badge" class="text-xs bg-black text-white font-semibold px-3 py-1 rounded-full uppercase tracking-wider">All-Time Max</span>
+            </div>
+
+            <!-- Table View -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="bg-neutral-50/70 border-b border-neutral-100 text-neutral-500 font-medium">
+                            <th class="py-3.5 px-6 w-16">Rank</th>
+                            <th class="py-3.5 px-4">Lifter</th>
+                            <th class="py-3.5 px-4 text-right">Bodyweight</th>
+                            <th class="py-3.5 px-4 text-right">Lift Weight</th>
+                            <th class="py-3.5 px-6 text-right">Ratio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-rows" class="divide-y divide-neutral-100">
+                        <!-- Dynamic rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="hidden py-16 text-center text-neutral-400 text-sm font-medium">
+                No entries available for this selection yet.
+            </div>
+
         </div>
     </div>
 
-    <!-- Placeholder Leaderboards for Squat and Deadlift -->
-    <div id="squat-leaderboard" class="leaderboard">
-        <h2>Squat Leaderboard</h2>
-        <p style="color: #666; font-style: italic;">No entries yet.</p>
-    </div>
-
-    <div id="deadlift-leaderboard" class="leaderboard">
-        <h2>Deadlift Leaderboard</h2>
-        <p style="color: #666; font-style: italic;">No entries yet.</p>
-    </div>
-
     <script>
-        function toggleLeaderboard(lift) {
-            // Hide all leaderboards first
-            document.querySelectorAll('.leaderboard').forEach(el => {
-                el.style.display = 'none';
+        // State management
+        let currentLift = 'bench'; // 'bench' | 'squat' | 'deadlift'
+        let currentCategory = 'max'; // 'max' | 'recorded'
+
+        // Database
+        const liftData = {
+            bench: {
+                max: [
+                    { rank: 1, name: "Aron Wolfson", bodyweight: 195, lift: 310 }
+                ],
+                recorded: [
+                    { rank: 1, name: "Aron Wolfson", bodyweight: 194, lift: 300 }
+                ]
+            },
+            squat: {
+                max: [],
+                recorded: []
+            },
+            deadlift: {
+                max: [],
+                recorded: []
+            }
+        };
+
+        function setLift(lift) {
+            currentLift = lift;
+            updateUI();
+        }
+
+        function setCategory(category) {
+            currentCategory = category;
+            updateUI();
+        }
+
+        function updateUI() {
+            // Update Top Navigation Buttons (Lifts)
+            const liftButtons = {
+                bench: document.getElementById('btn-bench'),
+                squat: document.getElementById('btn-squat'),
+                deadlift: document.getElementById('btn-deadlift')
+            };
+
+            Object.keys(liftButtons).forEach(key => {
+                const btn = liftButtons[key];
+                if (key === currentLift) {
+                    btn.classList.add('bg-black', 'text-white', 'border-black');
+                    btn.classList.remove('bg-white', 'text-black');
+                } else {
+                    btn.classList.remove('bg-black', 'text-white');
+                    btn.classList.add('bg-white', 'text-black');
+                }
             });
 
-            // Show the selected leaderboard
-            const activeLeaderboard = document.getElementById(`${lift}-leaderboard`);
-            if (activeLeaderboard) {
-                activeLeaderboard.style.display = 'block';
+            // Update Segmented Category Control Buttons
+            const btnMax = document.getElementById('btn-cat-max');
+            const btnRecorded = document.getElementById('btn-cat-recorded');
+
+            if (currentCategory === 'max') {
+                btnMax.classList.add('bg-white', 'text-neutral-900', 'shadow-sm');
+                btnMax.classList.remove('text-neutral-500', 'hover:text-neutral-900');
+                
+                btnRecorded.classList.remove('bg-white', 'text-neutral-900', 'shadow-sm');
+                btnRecorded.classList.add('text-neutral-500', 'hover:text-neutral-900');
+            } else {
+                btnRecorded.classList.add('bg-white', 'text-neutral-900', 'shadow-sm');
+                btnRecorded.classList.remove('text-neutral-500', 'hover:text-neutral-900');
+                
+                btnMax.classList.remove('bg-white', 'text-neutral-900', 'shadow-sm');
+                btnMax.classList.add('text-neutral-500', 'hover:text-neutral-900');
+            }
+
+            // Update Header Title and Badge
+            const liftLabels = {
+                bench: "Bench Press",
+                squat: "Squat",
+                deadlift: "Deadlift"
+            };
+            const catLabels = {
+                max: "All-Time Max",
+                recorded: "Recorded"
+            };
+
+            document.getElementById('leaderboard-title').textContent = `${liftLabels[currentLift]} Leaderboard`;
+            document.getElementById('category-badge').textContent = catLabels[currentCategory];
+
+            // Render Table Data
+            renderTable();
+        }
+
+        function renderTable() {
+            const tableRowsContainer = document.getElementById('leaderboard-rows');
+            const emptyStateContainer = document.getElementById('empty-state');
+            const tableElement = tableRowsContainer.closest('table');
+            
+            const entries = liftData[currentLift][currentCategory];
+
+            if (entries.length === 0) {
+                tableRowsContainer.innerHTML = '';
+                tableElement.classList.add('hidden');
+                emptyStateContainer.classList.remove('hidden');
+            } else {
+                emptyStateContainer.classList.add('hidden');
+                tableElement.classList.remove('hidden');
+
+                let htmlContent = '';
+                entries.forEach(entry => {
+                    const ratio = (entry.lift / entry.bodyweight).toFixed(2);
+                    htmlContent += `
+                        <tr class="hover:bg-neutral-50/50 transition-colors">
+                            <td class="py-4 px-6 font-bold text-neutral-900">${entry.rank}</td>
+                            <td class="py-4 px-4 font-semibold text-neutral-900">${entry.name}</td>
+                            <td class="py-4 px-4 text-right text-neutral-600">${entry.bodyweight} lbs</td>
+                            <td class="py-4 px-4 text-right font-bold text-black">${entry.lift} lbs</td>
+                            <td class="py-4 px-6 text-right font-semibold text-emerald-600">${ratio}x</td>
+                        </tr>
+                    `;
+                });
+                tableRowsContainer.innerHTML = htmlContent;
             }
         }
-    </script>
 
+        // Initialize display on window load
+        window.onload = function() {
+            updateUI();
+        };
+    </script>
 </body>
 </html>
