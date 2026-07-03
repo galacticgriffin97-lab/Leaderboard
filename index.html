@@ -1,1 +1,134 @@
-all hail
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lift Leaderboards</title>
+    <style>
+        /* Minimalist Reset */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /* Button Container */
+        .button-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        /* Styling for the Lift Buttons */
+        .lift-btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: 2px solid #000000;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .lift-btn:hover {
+            background-color: #000000;
+            color: #ffffff;
+        }
+
+        /* Leaderboard Container */
+        .leaderboard {
+            display: none; /* Hidden by default */
+            width: 300px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .leaderboard h2 {
+            margin-top: 0;
+            font-size: 20px;
+            border-bottom: 2px solid #000000;
+            padding-bottom: 10px;
+        }
+
+        /* Leaderboard Row Entry */
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 5px;
+            font-size: 18px;
+        }
+
+        .rank {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .name {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        .weight {
+            font-weight: bold;
+            color: #333333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="button-container">
+        <button class="lift-btn" onclick="toggleLeaderboard('bench')">Bench Press</button>
+        <button class="lift-btn" onclick="toggleLeaderboard('squat')">Squat</button>
+        <button class="lift-btn" onclick="toggleLeaderboard('deadlift')">Deadlift</button>
+    </div>
+
+    <!-- Bench Press Leaderboard -->
+    <div id="bench-leaderboard" class="leaderboard">
+        <h2>Bench Press Leaderboard</h2>
+        <div class="leaderboard-entry">
+            <span class="rank">1.</span>
+            <span class="name">Aron Wolfson</span>
+            <span class="weight">310lb</span>
+        </div>
+    </div>
+
+    <!-- Placeholder Leaderboards for Squat and Deadlift -->
+    <div id="squat-leaderboard" class="leaderboard">
+        <h2>Squat Leaderboard</h2>
+        <p style="color: #666; font-style: italic;">No entries yet.</p>
+    </div>
+
+    <div id="deadlift-leaderboard" class="leaderboard">
+        <h2>Deadlift Leaderboard</h2>
+        <p style="color: #666; font-style: italic;">No entries yet.</p>
+    </div>
+
+    <script>
+        function toggleLeaderboard(lift) {
+            // Hide all leaderboards first
+            document.querySelectorAll('.leaderboard').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Show the selected leaderboard
+            const activeLeaderboard = document.getElementById(`${lift}-leaderboard`);
+            if (activeLeaderboard) {
+                activeLeaderboard.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>
